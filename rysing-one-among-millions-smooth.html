@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Rysing — One Among Millions</title>
+  <meta name="description" content="A scroll-driven rising-star concept for Rysing Studio." />
+  <style>
+    :root {
+      --brand: #f04222;
+      --night: #020308;
+      --paper: #f6f1e8;
+      --ink: #0a0a0a;
+      --progress: 0;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--night);
+      color: white;
+      font-family: Arial, Helvetica, sans-serif;
+      overflow-x: hidden;
+      overscroll-behavior-y: none;
+    }
+
+    .intro,
+    .outro {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 48px 24px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .intro {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .intro-inner,
+    .outro-inner {
+      width: min(1180px, 100%);
+    }
+
+    .eyebrow {
+      margin: 0 0 22px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+
+    .intro h1,
+    .outro h2 {
+      margin: 0;
+      max-width: 1100px;
+      font-size: clamp(64px, 11vw, 180px);
+      line-height: .84;
+      letter-spacing: -.075em;
+      text-transform: uppercase;
+    }
+
+    .intro p,
+    .outro p {
+      max-width: 630px;
+      margin: 34px 0 0 auto;
+      font-size: clamp(18px, 2vw, 28px);
+      line-height: 1.2;
+    }
+
+    .journey {
+      position: relative;
+      height: 520vh;
+      background: var(--night);
+    }
+
+    .stage {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 50% 52%, rgba(240,66,34,0) 0%, rgba(240,66,34,0) 25%, transparent 55%),
+        linear-gradient(180deg, #020308 0%, #04050b 60%, #090609 100%);
+    }
+
+    .stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(240,66,34,.16), transparent 34%),
+        radial-gradient(circle at 50% 60%, rgba(255,169,91,.08), transparent 46%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .stage::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      pointer-events: none;
+      opacity: .22;
+      mix-blend-mode: soft-light;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.25'/%3E%3C/svg%3E");
+    }
+
+    #sky {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .vignette {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 50%, transparent 0 35%, rgba(0,0,0,.72) 95%);
+    }
+
+    .horizon {
+      position: absolute;
+      left: -8%;
+      right: -8%;
+      bottom: -17vh;
+      height: 30vh;
+      z-index: 3;
+      border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+      background: radial-gradient(ellipse at 50% 0%, #170d12 0%, #08070a 50%, #020308 72%);
+      box-shadow: 0 -32px 90px rgba(240,66,34,.08);
+    }
+
+    .micro-copy {
+      position: absolute;
+      left: clamp(20px, 4vw, 72px);
+      top: clamp(24px, 5vw, 72px);
+      z-index: 7;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.62);
+    }
+
+    .micro-copy::before {
+      content: "";
+      width: 46px;
+      height: 1px;
+      background: var(--brand);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      left: 50%;
+      bottom: 36px;
+      z-index: 7;
+      transform: translateX(-50%);
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.56);
+    }
+
+    .scroll-hint span {
+      width: 1px;
+      height: 56px;
+      background: linear-gradient(to bottom, var(--brand), transparent);
+      animation: pulseLine 1.5s ease-in-out infinite;
+      transform-origin: top;
+    }
+
+    @keyframes pulseLine {
+      0%, 100% { transform: scaleY(.35); opacity: .35; }
+      50% { transform: scaleY(1); opacity: 1; }
+    }
+
+    .hero-star {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 5;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      transform: translate3d(18vw, 84vh, 0) translate(-50%, -50%);
+      transform-origin: center;
+      background: #fff8e6;
+      box-shadow:
+        0 0 8px 2px rgba(255,255,255,.9),
+        0 0 22px 5px rgba(255,198,130,.65),
+        0 0 46px 10px rgba(240,66,34,.42);
+      will-change: transform, opacity, filter, box-shadow;
+      backface-visibility: hidden;
+    }
+
+    .hero-star::before,
+    .hero-star::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-star::before {
+      width: 26px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.95), transparent);
+    }
+
+    .hero-star::after {
+      width: 1px;
+      height: 26px;
+      background: linear-gradient(180deg, transparent, rgba(255,255,255,.95), transparent);
+    }
+
+    .halo {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 4;
+      width: 40vw;
+      aspect-ratio: 1;
+      transform: translate(-50%, -50%) scale(.1);
+      border-radius: 50%;
+      opacity: 0;
+      background: radial-gradient(circle, rgba(255,255,255,.2) 0%, rgba(240,66,34,.15) 14%, rgba(240,66,34,.05) 34%, transparent 70%);
+      filter: blur(8px);
+      pointer-events: none;
+    }
+
+    .flare {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      z-index: 5;
+      width: 120vw;
+      height: 2px;
+      transform: translate3d(-50%, -50%, 0) scaleX(0);
+      transform-origin: center;
+      opacity: 0;
+      background: linear-gradient(90deg, transparent 0%, rgba(240,66,34,.35) 18%, #fff 49%, #fff 51%, rgba(240,66,34,.35) 82%, transparent 100%);
+      box-shadow: 0 0 24px rgba(240,66,34,.7), 0 0 70px rgba(255,255,255,.4);
+      pointer-events: none;
+      will-change: transform, opacity;
+    }
+
+    .message {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      text-align: center;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .message-inner {
+      transform: translate3d(0, 70px, 0) scale(.96);
+      filter: blur(10px);
+      will-change: transform, opacity, filter;
+    }
+
+    .message h2 {
+      margin: 0;
+      font-size: clamp(62px, 12vw, 190px);
+      line-height: .78;
+      letter-spacing: -.075em;
+      text-transform: uppercase;
+    }
+
+    .message h2 span {
+      display: block;
+    }
+
+    .message .rise {
+      margin-top: .04em;
+      color: var(--brand);
+      font-family: "Bodoni 72", Didot, "Bodoni MT", "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: -.055em;
+      line-height: .84;
+      position: relative;
+    }
+
+    .message .rise::after {
+      content: "";
+      position: absolute;
+      width: .065em;
+      height: .065em;
+      left: 52.1%;
+      top: -.03em;
+      border-radius: 50%;
+      background: #fff8e6;
+      box-shadow: 0 0 10px 3px #fff, 0 0 28px 8px rgba(240,66,34,.85);
+    }
+
+    .message p {
+      max-width: 520px;
+      margin: 34px auto 0;
+      color: rgba(255,255,255,.65);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      line-height: 1.5;
+      text-transform: uppercase;
+    }
+
+    .progress {
+      position: absolute;
+      right: clamp(18px, 3vw, 42px);
+      top: 50%;
+      z-index: 7;
+      width: 2px;
+      height: 180px;
+      transform: translateY(-50%);
+      background: rgba(255,255,255,.12);
+    }
+
+    .progress-bar {
+      position: absolute;
+      inset: 0 0 auto;
+      height: 0;
+      background: var(--brand);
+      box-shadow: 0 0 15px rgba(240,66,34,.5);
+    }
+
+    .progress-label {
+      position: absolute;
+      right: 14px;
+      top: -2px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+      color: rgba(255,255,255,.4);
+      font-size: 9px;
+      font-weight: 800;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .outro {
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .outro h2 span {
+      color: var(--ink);
+      font-family: "Bodoni 72", Didot, "Bodoni MT", "Times New Roman", serif;
+      font-style: italic;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: -.045em;
+    }
+
+    @media (max-width: 760px) {
+      .journey { height: 460vh; }
+      .hero-star { transform: translate3d(22vw, 84vh, 0) translate(-50%, -50%); }
+      .message h2 { font-size: clamp(58px, 20vw, 110px); }
+      .message .rise::after { left: 53%; }
+      .progress { display: none; }
+      .micro-copy { left: 20px; top: 24px; max-width: 80%; line-height: 1.4; }
+      .scroll-hint { bottom: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .journey { height: 100vh; }
+      .scroll-hint { display: none; }
+      .hero-star { left: 50%; top: 50%; width: 72px; height: 72px; transform: translate(-50%, -50%); opacity: .25; filter: blur(8px); }
+      .halo { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      .flare { opacity: .7; width: 100vw; }
+      .message { opacity: 1; }
+      .message-inner { transform: none; filter: none; }
+    }
+  </style>
+</head>
+<body>
+  <section class="intro">
+    <div class="intro-inner">
+      <p class="eyebrow">Rysing concept study · 01</p>
+      <h1>One among millions.</h1>
+      <p>Scroll into the section. The page stops. One star rises above the rest until the message is impossible to miss.</p>
+    </div>
+  </section>
+
+  <section class="journey" id="journey" aria-label="One among millions scroll experience">
+    <div class="stage" id="stage">
+      <canvas id="sky" aria-hidden="true"></canvas>
+      <div class="vignette"></div>
+      <div class="horizon"></div>
+
+      <div class="micro-copy">One among millions</div>
+      <div class="scroll-hint" id="scrollHint">Scroll to rise<span></span></div>
+
+      <div class="hero-star" id="heroStar" aria-hidden="true"></div>
+      <div class="halo" id="halo" aria-hidden="true"></div>
+      <div class="flare" id="flare" aria-hidden="true"></div>
+
+      <div class="message" id="message">
+        <div class="message-inner" id="messageInner">
+          <h2><span>You deserve to</span><span class="rise">rise.</span></h2>
+          <p>Your expertise was always there. Now the world can see it.</p>
+        </div>
+      </div>
+
+      <div class="progress" aria-hidden="true">
+        <div class="progress-label">The rise</div>
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="outro">
+    <div class="outro-inner">
+      <p class="eyebrow">Rysing Studio</p>
+      <h2>From unseen to <span>unmissable.</span></h2>
+      <p>This is where the website would release the scroll and continue into the next editorial section.</p>
+    </div>
+  </section>
+
+  <!-- GSAP is loaded non-blockingly when internet is available. The native fallback keeps the file working offline. -->
+  <script>
+    (() => {
+      const journey = document.getElementById('journey');
+      const stage = document.getElementById('stage');
+      const canvas = document.getElementById('sky');
+      const ctx = canvas.getContext('2d');
+      const star = document.getElementById('heroStar');
+      const halo = document.getElementById('halo');
+      const flare = document.getElementById('flare');
+      const message = document.getElementById('message');
+      const messageInner = document.getElementById('messageInner');
+      const scrollHint = document.getElementById('scrollHint');
+      const progressBar = document.getElementById('progressBar');
+
+      let stars = [];
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      let currentProgress = 0;
+      let targetProgress = 0;
+      let usingGSAP = false;
+      let stageWidth = window.innerWidth;
+      let stageHeight = window.innerHeight;
+      let lastFrame = performance.now();
+
+      const clamp = (v, min = 0, max = 1) => Math.min(max, Math.max(min, v));
+      const map = (v, a, b, c, d) => c + (d - c) * clamp((v - a) / (b - a));
+      const smooth = t => t * t * (3 - 2 * t);
+      const easeInOutCubic = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+      function seededRandom(seed) {
+        let s = seed % 2147483647;
+        return () => (s = s * 16807 % 2147483647) / 2147483647;
+      }
+
+      function resizeSky() {
+        const rect = stage.getBoundingClientRect();
+        stageWidth = rect.width;
+        stageHeight = rect.height;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(rect.width * dpr);
+        canvas.height = Math.round(rect.height * dpr);
+        canvas.style.width = rect.width + 'px';
+        canvas.style.height = rect.height + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const random = seededRandom(20260801);
+        const count = Math.round(Math.min(900, Math.max(420, rect.width * rect.height / 1900)));
+        stars = Array.from({ length: count }, (_, i) => {
+          const depth = random();
+          return {
+            x: random() * rect.width,
+            y: random() * rect.height,
+            r: .35 + depth * 1.65,
+            a: .18 + random() * .72,
+            twinkle: random() * Math.PI * 2,
+            speed: .3 + random() * .9,
+            warm: random() > .86
+          };
+        });
+      }
+
+      function drawSky(time = 0) {
+        const w = canvas.width / dpr;
+        const h = canvas.height / dpr;
+        ctx.clearRect(0, 0, w, h);
+
+        const fade = 1 - smooth(map(currentProgress, .30, .80, 0, .88));
+        const drift = currentProgress * 42;
+
+        for (const s of stars) {
+          const pulse = .78 + Math.sin(time * .0007 * s.speed + s.twinkle) * .22;
+          const alpha = s.a * pulse * fade;
+          if (alpha < .01) continue;
+
+          ctx.beginPath();
+          ctx.fillStyle = s.warm ? `rgba(255,220,176,${alpha})` : `rgba(224,235,255,${alpha})`;
+          ctx.arc(s.x, (s.y - drift * s.r * .18 + h) % h, s.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        requestAnimationFrame(drawSky);
+      }
+
+      function renderProgress(p) {
+        const move = easeInOutCubic(map(p, .05, .67, 0, 1));
+        const x = 18 + (50 - 18) * move;
+        const y = 84 + (50 - 84) * move;
+        const baseScale = 1 + (4.4 - 1) * move;
+        const intensity = map(p, .1, .70, 1, 2.4);
+
+        const burst = smooth(map(p, .67, .84, 0, 1));
+        const starScale = baseScale * (1 + burst * 4.5);
+        const xPx = stageWidth * (x / 100);
+        const yPx = stageHeight * (y / 100);
+
+        star.style.transform = `translate3d(${xPx}px, ${yPx}px, 0) translate(-50%, -50%) scale(${starScale})`;
+        star.style.boxShadow = `
+          0 0 ${8 * intensity}px ${2 * intensity}px rgba(255,255,255,.95),
+          0 0 ${22 * intensity}px ${5 * intensity}px rgba(255,198,130,.75),
+          0 0 ${46 * intensity}px ${10 * intensity}px rgba(240,66,34,.55)`;
+        star.style.filter = `blur(${burst * 8}px)`;
+        star.style.opacity = String(1 - burst * .72);
+
+        halo.style.opacity = String(map(p, .55, .86, 0, 1));
+        halo.style.transform = `translate3d(-50%, -50%, 0) scale(${map(p, .55, .90, .08, 1.55)})`;
+        stage.style.background = `
+          radial-gradient(circle at 50% 52%, rgba(240,66,34,${map(p,.48,.88,0,.16)}) 0%, transparent 38%),
+          linear-gradient(180deg, #020308 0%, #04050b 60%, rgb(${Math.round(9 + burst*11)},${Math.round(6 + burst*4)},${Math.round(9 + burst*3)}) 100%)`;
+
+        const flareP = smooth(map(p, .70, .88, 0, 1));
+        flare.style.transform = `translate3d(-50%, -50%, 0) scaleX(${flareP})`;
+        flare.style.opacity = String(Math.sin(flareP * Math.PI) * .95);
+        flare.style.height = (2 + flareP * 5) + 'px';
+
+        const textP = smooth(map(p, .77, .94, 0, 1));
+        message.style.opacity = String(textP);
+        messageInner.style.transform = `translate3d(0, ${70 * (1 - textP)}px, 0) scale(${.96 + textP * .04})`;
+        messageInner.style.filter = `blur(${10 * (1 - textP)}px)`;
+
+        scrollHint.style.opacity = String(1 - smooth(map(p, .02, .18, 0, 1)));
+        progressBar.style.height = (p * 100) + '%';
+      }
+
+      function setTargetProgress(p) {
+        targetProgress = clamp(p);
+      }
+
+      function animationLoop(now) {
+        const dt = Math.min((now - lastFrame) / 1000, .05);
+        lastFrame = now;
+
+        // Time-based damping gives the same smoothness on trackpads and notched mouse wheels.
+        const damping = 1 - Math.exp(-5.5 * dt);
+        currentProgress += (targetProgress - currentProgress) * damping;
+        if (Math.abs(targetProgress - currentProgress) < .00001) currentProgress = targetProgress;
+
+        renderProgress(currentProgress);
+        requestAnimationFrame(animationLoop);
+      }
+
+      function nativeProgress() {
+        if (usingGSAP) return;
+        const rect = journey.getBoundingClientRect();
+        const max = journey.offsetHeight - window.innerHeight;
+        const p = clamp(-rect.top / Math.max(max, 1));
+        setTargetProgress(p);
+      }
+
+      resizeSky();
+      drawSky();
+      renderProgress(0);
+      requestAnimationFrame(animationLoop);
+
+      window.addEventListener('resize', () => {
+        resizeSky();
+        nativeProgress();
+      }, { passive: true });
+      window.addEventListener('scroll', nativeProgress, { passive: true });
+
+      function initGSAP() {
+        if (!window.gsap || !window.ScrollTrigger) return;
+        usingGSAP = true;
+        gsap.registerPlugin(ScrollTrigger);
+        ScrollTrigger.create({
+          trigger: journey,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: true,
+          onUpdate: self => setTargetProgress(self.progress)
+        });
+        ScrollTrigger.refresh();
+      }
+
+      function loadScript(src, timeout = 3500) {
+        return new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          const timer = setTimeout(() => {
+            script.remove();
+            reject(new Error('Script load timed out'));
+          }, timeout);
+          script.src = src;
+          script.async = true;
+          script.onload = () => { clearTimeout(timer); resolve(); };
+          script.onerror = () => { clearTimeout(timer); reject(new Error('Script load failed')); };
+          document.head.appendChild(script);
+        });
+      }
+
+      // Enhance with GSAP ScrollTrigger when this file is hosted online.
+      // Local/offline previews use the identical native scroll fallback and never wait for a network request.
+      if (/^https?:$/.test(location.protocol)) {
+        loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js')
+          .then(() => loadScript('https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js'))
+          .then(initGSAP)
+          .catch(() => nativeProgress());
+      }
+
+      nativeProgress();
+    })();
+  </script>
+</body>
+</html>
